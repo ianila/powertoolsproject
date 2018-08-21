@@ -7,12 +7,12 @@ from .forms import ProfileCreationForm, ProfileLoginForm
 class SignUp(generic.CreateView):
     form_class = ProfileCreationForm
     success_url = reverse_lazy('login')
-    template_name = 'users/signup.html'
+    template_name = 'web/signup.html'
 
 class LoginView(generic.FormView):
     form_class = ProfileLoginForm
     success_url = reverse_lazy('home')
-    template_name = 'users/login.html'
+    template_name = 'web/login.html'
 
     def form_valid(self, form):
         username = form.cleaned_data['username']
