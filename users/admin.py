@@ -7,7 +7,7 @@ from .models import Profile
 
 class ProfileAdmin(UserAdmin):
     add_form = ProfileCreationForm
-    form = ProfileChangeForm
+    change_form = ProfileChangeForm
     model = Profile
     list_display = ['username', 'fullname', 'address', 'birthdate', 'nic', 'mobilephone', 'homephone', 'email']
 

@@ -1,0 +1,174 @@
+{% extends 'controlpanel/controlpanel_base.html' %}
+{% block content %}
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:43px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:22px">
+    <h5><b><i class="fa fa-dashboard"></i> Power Tools Control Panel - Tools</b></h5>
+  </header>
+
+<div class="w3-container">
+
+    <button type="button" class="w3-button w3-blue w3-margin-bottom" onclick="document.getElementById('nm').style.display='block'"><i class="fa fa-edit"></i>  Create New Tool</button>
+
+{% for tool in tools %}
+
+    <div class="w3-container w3-card w3-white w3-round w3-margin-bottom"><br>
+        <img src="../../static/icons/tools.png" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px">
+        <h4>{{ tool.make }}, {{ tool.serialno }}</h4>
+        {% if tool.last_rentered %}
+            <div class="w3-left w3-opacity">Last rent - {{ tool.last_rentered }}</div><br>
+        {% else %}
+            <div class="w3-left w3-opacity">Last rent - Not Rentered yet</div><br>
+        {% endif %}
+        <hr class="w3-clear">
+        <img src="../../static/images/tools.jpeg" style="width:20%" class="w3-margin-bottom">
+        <p>{{ tool.desc }}</p>
+        <p>Rental value - LKR {{ tool.rentalvalue }}</p>
+        <button type="button" class="w3-button w3-green w3-margin-bottom"><i class="fa fa-exchange"></i>  Rents</button>
+        <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="modalFunction({{ tool.pk }})"><i class="fa fa-edit"></i>  Edit</button>
+        <button type="button" class="w3-button w3-red w3-margin-bottom" onclick="deleteFunction({{ tool.pk }})"><i class="fa fa-remove"></i>  Remove</button>
+      </div>
+
+{% endfor %}
+
+</div>
+
+<!-- modal for new -->
+
+  <div id="nm" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-round">
+      <header class="w3-container">
+        <span onclick="document.getElementById('nm').style.display='none'"
+        class="w3-button w3-display-topright w3-round">&times;</span>
+        <h2>Create new Tool</h2>
+      </header>
+        <hr class="w3-clear">
+        <form class="w3-container" action="{% url 'newtools' %}" method="post">
+            {% csrf_token %}
+            <table class="w3-table">
+                {{ newform }}
+            </table>
+
+              <footer class="w3-margin-top">
+                <button type="submit" class="w3-button w3-blue w3-margin-bottom"><i class="fa fa-edit"></i>  Create</button>
+                <button type="reset" class="w3-button w3-orange w3-margin-bottom"><i class="fa fa-edit"></i>  Clear</button>
+                <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="document.getElementById('nm').style.display='none'" ><i class="fa fa-remove"></i>  Cancel</button>
+              </footer>
+        </form>
+    </div>
+  </div>
+
+<!-- modal for edit -->
+
+  <div id="id01" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-round">
+      <header class="w3-container">
+        <span onclick="document.getElementById('id01').style.display='none'"
+        class="w3-button w3-display-topright w3-round">&times;</span>
+        <h2 id="toolname">Modal Header</h2>
+      </header>
+        <hr class="w3-clear">
+        <form class="w3-container" action="{% url 'updatetools' %}" method="post">
+            {% csrf_token %}
+            <table class="w3-table">
+                {{ editform }}
+            </table>
+
+            <input type="hidden" value="" id="pk" name="pk">
+              <footer class="w3-margin-top">
+                <button type="submit" class="w3-button w3-blue w3-margin-bottom"><i class="fa fa-edit"></i>  Save</button>
+                <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="document.getElementById('id01').style.display='none'" ><i class="fa fa-remove"></i>  Cancel</button>
+              </footer>
+        </form>
+    </div>
+  </div>
+
+<!-- modal for delete -->
+
+  <div id="dm" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-round">
+      <header class="w3-container">
+        <span onclick="document.getElementById('dm').style.display='none'"
+        class="w3-button w3-display-topright w3-round">&times;</span>
+        <h2 id="deletetoolname">Modal Header</h2>
+      </header>
+        <hr class="w3-clear">
+        <form class="w3-container" action="{% url 'deletetools' %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure?</p>
+
+            <input type="hidden" value="" id="dmpk" name="pk">
+              <footer class="w3-margin-top">
+                <button type="submit" class="w3-button w3-red w3-margin-bottom"><i class="fa fa-edit"></i>  Remove</button>
+                <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="document.getElementById('dm').style.display='none'" ><i class="fa fa-remove"></i>  Cancel</button>
+              </footer>
+        </form>
+    </div>
+  </div>
+
+
+<!-- Footer -->
+  <footer class="w3-container w3-padding-16 w3-light-grey">
+    <h4>FOOTER</h4>
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+  </footer>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+
+var namecontainer = document.getElementById('toolname');
+
+function modalFunction(t) {
+    var editRequest = new XMLHttpRequest();
+
+    editRequest.open('GET', "/controlpanel/edittools/?pk=" + t);
+    editRequest.onload = function(){
+        var editData = JSON.parse(editRequest.responseText);
+        renderEdit(editData);
+    };
+    editRequest.send();
+}
+
+function renderEdit(data){
+    namecontainer.innerHTML = 'Edit ' + data.make + ", " +data.serialno;
+
+    document.getElementById('sn').value = data.serialno
+    document.getElementById('mk').value = data.make
+    document.getElementById('rv').value = data.rentalvalue
+    document.getElementById('dc').value = data.desc
+    document.getElementById('pk').value = data.pk
+
+    document.getElementById('id01').style.display='block';
+}
+
+var deletenamecontainer = document.getElementById('deletetoolname');
+
+function deleteFunction(t) {
+    var editRequest = new XMLHttpRequest();
+
+    editRequest.open('GET', "/controlpanel/edittools/?pk=" + t);
+    editRequest.onload = function(){
+        var deleteData = JSON.parse(editRequest.responseText);
+        renderDelete(deleteData);
+    };
+    editRequest.send();
+}
+
+function renderDelete(data){
+    deletenamecontainer.innerHTML = 'Delete ' + data.make + ", " +data.serialno;
+
+    document.getElementById('dmpk').value = data.pk
+
+    document.getElementById('dm').style.display='block';
+}
+
+</script>
+{% endblock %}
+
