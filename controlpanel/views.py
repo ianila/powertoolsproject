@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 from users.models import Profile
 from .forms import LoginForm, StaffCreationForm, StaffEditForm
@@ -33,23 +34,27 @@ class LogOutView(generic.RedirectView):
         logout(request)
         return super(LogOutView, self).get(request, *args, **kwargs)
 
+@login_required
 def cpstaff(request):
     users = Profile.objects.filter(isstaff=True)
     newform = StaffCreationForm()
     editform = StaffEditForm()
     return render(request, 'controlpanel/staff.html', {'users': users, 'newform': newform, 'editform': editform})
 
+@login_required
 def staff_edit(request):
     profile = Profile.objects.get(pk=request.GET.get('pk'))
     data = { 'pk':profile.pk, 'username':profile.username, 'fullname':profile.fullname, 'address':profile.address, 'birthdate':profile.birthdate, 'nic':profile.nic, 'mobilephone':profile.mobilephone, 'homephone':profile.homephone, 'email':profile.email}
     return JsonResponse(data, safe=False)
 
+@login_required
 def staff_create(request):
     form = StaffCreationForm(request.POST or None)
     if form.is_valid():
         form.save()
         return redirect('cpstaff')
 
+@login_required
 def staff_update(request):
     print(request.POST.get('pk'))
     profile = Profile.objects.get(pk=request.POST.get('pk'))
@@ -65,6 +70,7 @@ def staff_update(request):
     
     return redirect('cpstaff')
 
+@login_required
 def staff_delete(request):
     print(request.POST.get('pk'))
     Profile.objects.get(pk=request.POST.get('pk')).delete()       
