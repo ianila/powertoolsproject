@@ -63,5 +63,110 @@
     </div>
   </div>
 
+<!-- modal for edit -->
+
+  <div id="id01" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-round">
+      <header class="w3-container">
+        <span onclick="document.getElementById('id01').style.display='none'"
+        class="w3-button w3-display-topright w3-round">&times;</span>
+        <h2 id="staffname">Modal Header</h2>
+      </header>
+        <hr class="w3-clear">
+        <form class="w3-container" action="{% url 'cpupdatestaff' %}" method="post">
+            {% csrf_token %}
+            <table class="w3-table">
+                {{ editform }}
+            </table>
+
+            <input type="hidden" value="" id="pk" name="pk">
+              <footer class="w3-margin-top">
+                <button type="submit" class="w3-button w3-blue w3-margin-bottom"><i class="fa fa-edit"></i>  Save</button>
+                <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="document.getElementById('id01').style.display='none'" ><i class="fa fa-remove"></i>  Cancel</button>
+              </footer>
+        </form>
+    </div>
+  </div>
+
+<!-- modal for delete -->
+
+  <div id="dm" class="w3-modal">
+    <div class="w3-modal-content w3-card-4 w3-round">
+      <header class="w3-container">
+        <span onclick="document.getElementById('dm').style.display='none'"
+        class="w3-button w3-display-topright w3-round">&times;</span>
+        <h2 id="deletestaffname">Modal Header</h2>
+      </header>
+        <hr class="w3-clear">
+        <form class="w3-container" action="{% url 'cpdeletestaff' %}" method="post">
+            {% csrf_token %}
+            <p>Are you sure?</p>
+
+            <input type="hidden" value="" id="dmpk" name="pk">
+              <footer class="w3-margin-top">
+                <button type="submit" class="w3-button w3-red w3-margin-bottom"><i class="fa fa-edit"></i>  Remove</button>
+                <button type="button" class="w3-button w3-green w3-margin-bottom" onclick="document.getElementById('dm').style.display='none'" ><i class="fa fa-remove"></i>  Cancel</button>
+              </footer>
+        </form>
+    </div>
+  </div>
+
 {% endblock %}
+
+{% block script %}
+<script>
+
+var namecontainer = document.getElementById('staffname');
+
+function editFunction(t) {
+    var editRequest = new XMLHttpRequest();
+
+    editRequest.open('GET', "/controlpanel/editstaff/?pk=" + t);
+    editRequest.onload = function(){
+        var editData = JSON.parse(editRequest.responseText);
+        renderEdit(editData);
+    };
+    editRequest.send();
+}
+
+function renderEdit(data){
+    namecontainer.innerHTML = 'Edit ' + data.username;
+
+    document.getElementById('username').value = data.username;
+    document.getElementById('fullname').value = data.fullname;
+    document.getElementById('address').value = data.address;
+    document.getElementById('birthdate').value = data.birthdate;
+    document.getElementById('nic').value = data.nic;
+    document.getElementById('mobilephone').value = data.mobilephone;
+    document.getElementById('homephone').value = data.homephone;
+    document.getElementById('email').value = data.email;
+    document.getElementById('pk').value = data.pk
+
+    document.getElementById('id01').style.display='block';
+}
+
+var deletenamecontainer = document.getElementById('deletestaffname');
+
+function deleteFunction(t) {
+    var editRequest = new XMLHttpRequest();
+
+    editRequest.open('GET', "/controlpanel/editstaff/?pk=" + t);
+    editRequest.onload = function(){
+        var deleteData = JSON.parse(editRequest.responseText);
+        renderDelete(deleteData);
+    };
+    editRequest.send();
+}
+
+function renderDelete(data){
+    deletenamecontainer.innerHTML = 'Delete ' + data.fullname;
+
+    document.getElementById('dmpk').value = data.pk
+
+    document.getElementById('dm').style.display='block';
+}
+
+</script>
+{% endblock %}
+
 

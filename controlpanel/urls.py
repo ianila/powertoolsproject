@@ -7,4 +7,7 @@ urlpatterns = [
     path('logout/', views.LogOutView.as_view(), name='cplogout'),
     path('staff/', views.cpstaff, name='cpstaff'),
     path('newstaff/', views.staff_create, name='cpnewstaff'),
+    path('editstaff/', views.staff_edit, name='cpeditstaff'),
+    path('updatestaff/', views.staff_update, name='cpupdatestaff'),
+    path('deletestaff/', views.staff_delete, name='cpdeletestaff'),
 ]
